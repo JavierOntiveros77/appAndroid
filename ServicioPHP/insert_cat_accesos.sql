@@ -1,0 +1,1 @@
+INSERT INTO cat_accesos(password) select 'SDGFSFDH45635426DFGHS5467.';
