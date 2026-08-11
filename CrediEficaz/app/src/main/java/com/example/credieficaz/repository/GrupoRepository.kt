@@ -5,10 +5,9 @@ import com.example.credieficaz.models.DiarioGrupoItem
 
 class GrupoRepository {
 
-    suspend fun obtenerGrupos(): List<DiarioGrupoItem> {
-
+    suspend fun obtenerGrupos(fechaFin: String): List<DiarioGrupoItem> {
         return RetrofitClient
             .api
-            .obtenerGrupos()
+            .obtenerGrupos(fechaFin)
     }
 }

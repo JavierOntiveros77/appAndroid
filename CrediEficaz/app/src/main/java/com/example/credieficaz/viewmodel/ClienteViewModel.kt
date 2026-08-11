@@ -1,6 +1,5 @@
 package com.example.credieficaz.viewmodel
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.example.credieficaz.models.DiarioClienteItem
 import com.example.credieficaz.repository.ClienteRepository
-
+import java.time.LocalDate
 
 class ClienteViewModel : ViewModel() {
 
@@ -20,28 +19,21 @@ class ClienteViewModel : ViewModel() {
     val listaClientes: StateFlow<List<DiarioClienteItem>>
             = _listaClientes
 
-    init {
-        cargarClientes()
-    }
-
-    private fun cargarClientes() {
-
+    fun cargarClientes(fechaFin: LocalDate) {
         viewModelScope.launch {
-
             try {
-
-                val datos = repository.obtenerClientes()
-
-                println("CLIENTES RECIBIDOS: ${datos.size}")
-
+                val fechaFormateada = String.format(
+                    "%04d-%02d-%02d",
+                    fechaFin.year,
+                    fechaFin.monthValue,
+                    fechaFin.dayOfMonth
+                )
+                val datos = repository.obtenerClientes(fechaFormateada)
                 _listaClientes.value = datos
-
             } catch (e: Exception) {
-
-                println("Error API: ${e.message}")
-
+                println(">>> ERROR: ${e.message}")
+                e.printStackTrace()
             }
-
         }
     }
 }

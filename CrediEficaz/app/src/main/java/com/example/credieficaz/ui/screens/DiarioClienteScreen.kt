@@ -35,24 +35,22 @@ fun DiarioClienteScreen(
     var fechaFin by remember { mutableStateOf(LocalDate.now()) }
     var nombreBusqueda by remember { mutableStateOf("") }
     val listaClientes by viewModel.listaClientes.collectAsState()
-    val listaFiltrada by remember(nombreBusqueda, fechaFin, listaClientes) {
+
+    // 👇 Dispara la consulta al servidor cada vez que cambia fechaFin
+    LaunchedEffect(fechaFin) {
+        viewModel.cargarClientes(fechaFin)
+    }
+
+    // 👇 El filtro de nombre sigue siendo local (no tiene sentido pegarle al server por cada letra)
+    val listaFiltrada by remember(nombreBusqueda, listaClientes) {
         derivedStateOf {
-            val apiFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
             listaClientes.filter { cliente ->
-                val coincideNombre = cliente.Nombre.contains(nombreBusqueda, ignoreCase = true)
-                val fechaPagoDate = try {
-                    LocalDate.parse(cliente.FechaPago, apiFormatter)
-                } catch (e: Exception) {
-                    LocalDate.MIN
-                }
-                val coincideFecha = !fechaPagoDate.isAfter(fechaFin)
-
-                coincideNombre && coincideFecha
+                cliente.Nombre.contains(nombreBusqueda, ignoreCase = true)
             }
         }
     }
 
+    Spacer(Modifier.height(20.dp))
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -131,7 +129,7 @@ fun DateBox(
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = fecha
-            .atStartOfDay(ZoneId.systemDefault())
+            .atStartOfDay(ZoneId.of("UTC"))
             .toInstant()
             .toEpochMilli()
     )
@@ -167,7 +165,7 @@ fun DateBox(
                     datePickerState.selectedDateMillis?.let {
                         val nuevaFecha =
                             Instant.ofEpochMilli(it)
-                                .atZone(ZoneId.systemDefault())
+                                .atZone(ZoneId.of("UTC"))
                                 .toLocalDate()
                         onFechaChange(nuevaFecha)
                     }
@@ -230,7 +228,7 @@ fun ClienteTable(
                     .height(48.dp)
                     .background(Color.LightGray)
             ) {
-                TableHeader("Acción", ClienteTableWeights.ACCION)
+                /*TableHeader("Acción", ClienteTableWeights.ACCION)*/
                 TableHeader("Cliente", ClienteTableWeights.NUM_CLIENTE)
                 TableHeader("Nombre", ClienteTableWeights.NOMBRE)
                 TableHeader("Referencia", ClienteTableWeights.REFERENCIA)
@@ -260,7 +258,7 @@ fun ClienteTable(
                             .height(48.dp)
                             .background(bg)
                     ) {
-                        TableCell("", ClienteTableWeights.ACCION)
+                        /*TableCell("", ClienteTableWeights.ACCION)*/
                         TableCell(item.NumeroCliente, ClienteTableWeights.NUM_CLIENTE)
                         TableCell(item.Nombre, ClienteTableWeights.NOMBRE)
                         TableCell(item.Referencia, ClienteTableWeights.REFERENCIA)

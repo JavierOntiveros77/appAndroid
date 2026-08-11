@@ -36,31 +36,22 @@ fun DiarioGrupoScreen(
     var fechaFin by remember { mutableStateOf(LocalDate.now()) }
     var nombreBusqueda by remember { mutableStateOf("") }
     val listaGrupos by viewModel.listaGrupos.collectAsState()
-    val listaFiltrada by remember(nombreBusqueda, fechaFin, listaGrupos) {
+
+    // 👇 Llama al servidor cada vez que cambia la fecha
+    LaunchedEffect(fechaFin) {
+        viewModel.cargarGrupos(fechaFin)
+    }
+
+    // 👇 Filtro de nombre sigue siendo local
+    val listaFiltrada by remember(nombreBusqueda, listaGrupos) {
         derivedStateOf {
-            // CAMBIO AQUÍ: Ahora el formato coincide con tu DATE_FORMAT de MySQL
-            val apiFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
             listaGrupos.filter { grupo ->
-                val coincideNombre = grupo.NombreGrupo.contains(nombreBusqueda, ignoreCase = true)
-
-                val fechaPagoDate = try {
-                    // Ahora podrá parsear "09/03/2026" correctamente
-                    LocalDate.parse(grupo.FechaPago, apiFormatter)
-                } catch (e: Exception) {
-                    // Loguea el error para debuguear si fuera necesario
-                    println("Error parseando fecha: ${grupo.FechaPago}")
-                    LocalDate.MIN
-                }
-
-                // Si la fecha del grupo es igual o anterior a la seleccionada, se muestra
-                val coincideFecha = !fechaPagoDate.isAfter(fechaFin)
-
-                coincideNombre && coincideFecha
+                grupo.NombreGrupo.contains(nombreBusqueda, ignoreCase = true)
             }
         }
     }
 
+    Spacer(Modifier.height(20.dp))
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,7 +130,7 @@ fun DateBoxGrupo(
 
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = fecha
-            .atStartOfDay(ZoneId.systemDefault())
+            .atStartOfDay(ZoneId.of("UTC"))
             .toInstant()
             .toEpochMilli()
     )
@@ -175,7 +166,7 @@ fun DateBoxGrupo(
                     datePickerState.selectedDateMillis?.let {
                         val nuevaFecha =
                             Instant.ofEpochMilli(it)
-                                .atZone(ZoneId.systemDefault())
+                                .atZone(ZoneId.of("UTC"))
                                 .toLocalDate()
                         onFechaChange(nuevaFecha)
                     }
@@ -198,14 +189,12 @@ fun DateBoxGrupo(
 }
 
 object GrupoTableWeights {
-
     const val ACCION = 1.2f
     const val GRUPO = 0.6f
     const val NOMBRE_GRUPO = 1.8f
     const val NUM_CLICLO = 0.6f
     const val NOMBRE_REPRESENTANTE = 1.5f
     const val NUM_INTEGRANTES = 1.0f
-
     const val FECHA_PAGO = 1.5f
     const val NUM_PAGO = 0.5f
     const val DE = 0.5f
@@ -238,7 +227,7 @@ fun GrupoTable(
                     .height(48.dp)
                     .background(Color.LightGray)
             ) {
-                TableGrupoHeader("", GrupoTableWeights.ACCION)
+                /*TableGrupoHeader("Acción", GrupoTableWeights.ACCION)*/
                 TableGrupoHeader("Grupo", GrupoTableWeights.GRUPO)
                 TableGrupoHeader("NombreGrupo", GrupoTableWeights.NOMBRE_GRUPO)
                 TableGrupoHeader("Ciclo", GrupoTableWeights.NUM_CLICLO)
@@ -268,7 +257,7 @@ fun GrupoTable(
                             .height(48.dp)
                             .background(bg)
                     ) {
-                        TableGrupoCell("", GrupoTableWeights.ACCION)
+                        /*TableGrupoCell("", GrupoTableWeights.ACCION)*/
                         TableGrupoCell(item.Grupo.toString(), GrupoTableWeights.GRUPO)
                         TableGrupoCell(item.NombreGrupo, GrupoTableWeights.NOMBRE_GRUPO)
                         TableGrupoCell(item.NumCiclo.toString(), GrupoTableWeights.NUM_CLICLO)

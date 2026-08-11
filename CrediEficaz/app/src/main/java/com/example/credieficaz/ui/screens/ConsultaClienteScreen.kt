@@ -39,6 +39,7 @@ fun ConsultaClienteScreen(
         }
     }
 
+    Spacer(Modifier.height(20.dp))
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -163,7 +164,7 @@ fun ClientesTable(
                     .height(48.dp)
                     .background(Color.LightGray)
             ) {
-                TableHeaderCliente("Acción", ClientesTableWeights.ACCION)
+                /*TableHeaderCliente("Acción", ClientesTableWeights.ACCION)*/
                 TableHeaderCliente("Cliente", ClientesTableWeights.CLIENTE)
                 TableHeaderCliente("Nombre", ClientesTableWeights.NOMBRE)
                 TableHeaderCliente("Préstamo", ClientesTableWeights.PRESTAMO)
@@ -202,7 +203,7 @@ fun ClientesTable(
                             .height(48.dp)
                             .background(bg)
                     ) {
-                        TableCellCliente("", ClientesTableWeights.ACCION)
+                        /*TableCellCliente("", ClientesTableWeights.ACCION)*/
                         TableCellCliente(item.Numcliente.toString(), ClientesTableWeights.CLIENTE)
                         TableCellCliente(item.Nombre, ClientesTableWeights.NOMBRE)
                         TableCellCliente(item.Préstamo.toString(), ClientesTableWeights.PRESTAMO)

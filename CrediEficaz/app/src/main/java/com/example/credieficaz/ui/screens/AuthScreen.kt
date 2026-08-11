@@ -22,36 +22,43 @@ fun AuthScreen(
     viewModel: AuthViewModel,
     onAccessGranted: () -> Unit
 ) {
-    // Valor que tú le vas a dar para comparar
     val passwordRequerido = "SDGFSFDH45635426DFGHS5467."
 
+    // Dispara la validación al entrar
     LaunchedEffect(Unit) {
         viewModel.validarEntrada(passwordRequerido)
     }
 
-    // Observamos el estado del ViewModel
+    // 👇 Escucha cambios de authStatus en el nivel raíz del Composable
+    LaunchedEffect(viewModel.authStatus) {
+        if (viewModel.authStatus == 1) {
+            onAccessGranted()
+        }
+    }
+
+    // Solo maneja la UI, sin lógica de navegación aquí
     when (viewModel.authStatus) {
-        0 -> { // Cargando
+        0 -> {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
-        1 -> { // Autorizado
-            LaunchedEffect(Unit) { onAccessGranted() }
-        }
-        2 -> { // Denegado
+        2 -> {
             Box(
-                modifier = Modifier.fillMaxSize().padding(32.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "⚠️ DISPOSITIVO NO AUTORIZADO\nNo tienes permiso para usar esta aplicación.",
                     color = Color.Red,
+                    text = "⚠️ DISPOSITIVO NO AUTORIZADO\nNo tienes permiso para usar esta aplicación.",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
+        // Estado 1 no necesita UI — ya navegó
     }
 }

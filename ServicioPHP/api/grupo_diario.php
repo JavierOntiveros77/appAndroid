@@ -6,6 +6,17 @@ require_once "db.php";
 
 $conn = getConnection();
 
+// Recibe la fecha como parámetro GET, formato esperado: yyyy-MM-dd
+$fechaFin = $_GET['fecha_fin'] ?? null;
+
+// Si no llega o tiene formato inválido, usa la fecha actual (Mexico City)
+if (!$fechaFin || !DateTime::createFromFormat('Y-m-d', $fechaFin)) {
+    $fechaFin = date('Y-m-d'); // fallback
+    $usarFechaServidor = true;
+} else {
+    $usarFechaServidor = false;
+}
+
 $sql = "SELECT mae.id_maerepresentantes as Grupo, mae.nom_grupo as NombreGrupo, 
 	mae.num_ciclo as NumCiclo, mae.nom_representante NombreRepresentante,
 	mae.num_integrantes as NumIntegrantes,
@@ -23,16 +34,21 @@ $sql = "SELECT mae.id_maerepresentantes as Grupo, mae.nom_grupo as NombreGrupo,
 	FROM maerepresentantes mae
 	LEFT JOIN movgrupos mov ON mov.id_grupo = mae.id_maerepresentantes
 	LEFT JOIN maegrupos mgr ON mgr.id_integrante = mae.id_maerepresentantes
-	WHERE mae.num_pagopendiente > 0 and DATE(mov.fec_pago) <= DATE(CONVERT_TZ(NOW(),'UTC','America/Mexico_City')) 
+	WHERE mae.num_pagopendiente > 0 and DATE(mov.fec_pago) <= ?
 	AND mov.num_cantidad <= 0
 	GROUP BY mae.id_maerepresentantes ORDER BY mov.fec_pago";
 
-$result = $conn->query($sql);
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $fechaFin);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $data = [];
-
 while ($row = $result->fetch_assoc()) {
     $data[] = $row;
 }
 
 echo json_encode($data);
+
+$stmt->close();
+$conn->close();

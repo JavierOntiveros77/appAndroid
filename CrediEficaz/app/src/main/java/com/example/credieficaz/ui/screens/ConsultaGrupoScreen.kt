@@ -41,6 +41,7 @@ fun ConsultaGrupoScreen(
         }
     }
 
+    Spacer(Modifier.height(20.dp))
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -159,7 +160,7 @@ fun GrupoTableConsulta(
                     .height(48.dp)
                     .background(Color.LightGray)
             ) {
-                TableGrupoConsultaHeader("", GrupoTableConsultaWeights.ACCION)
+                /*TableGrupoConsultaHeader("Acción", GrupoTableConsultaWeights.ACCION)*/
                 TableGrupoConsultaHeader("Grupo", GrupoTableConsultaWeights.GRUPO)
                 TableGrupoConsultaHeader("NombreGrupo", GrupoTableConsultaWeights.NOMBRE_GRUPO)
                 TableGrupoConsultaHeader("Ciclo", GrupoTableConsultaWeights.NUM_CLICLO)
@@ -191,7 +192,7 @@ fun GrupoTableConsulta(
                             .height(48.dp)
                             .background(bg)
                     ) {
-                        TableGrupoConsultaCell("", GrupoTableConsultaWeights.ACCION)
+                        /*TableGrupoConsultaCell("", GrupoTableConsultaWeights.ACCION)*/
                         TableGrupoConsultaCell(item.Grupo.toString(), GrupoTableConsultaWeights.GRUPO)
                         TableGrupoConsultaCell(item.NombreGrupo, GrupoTableConsultaWeights.NOMBRE_GRUPO)
                         TableGrupoConsultaCell(item.NumCiclo.toString(), GrupoTableConsultaWeights.NUM_CLICLO)

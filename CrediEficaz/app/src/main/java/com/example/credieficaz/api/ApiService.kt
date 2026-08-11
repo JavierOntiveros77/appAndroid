@@ -10,14 +10,19 @@ import retrofit2.http.GET
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface ApiService {
 
     @GET("clientes_diario.php")
-    suspend fun obtenerClientes(): List<DiarioClienteItem>
+    suspend fun obtenerClientes(
+        @Query("fecha_fin") fechaFin: String
+    ): List<DiarioClienteItem>
 
     @GET("grupo_diario.php")
-    suspend fun obtenerGrupos(): List<DiarioGrupoItem>
+    suspend fun obtenerGrupos(
+        @Query("fecha_fin") fechaFin: String
+    ): List<DiarioGrupoItem>
 
     @GET("consulta_clientes.php")
     suspend fun obtenerConsultaClientes(): List<ConsultaClienteItem>
